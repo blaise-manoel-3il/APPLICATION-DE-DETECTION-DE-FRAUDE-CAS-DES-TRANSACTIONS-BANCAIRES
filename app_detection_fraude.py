@@ -1,188 +1,84 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 1,
-   "id": "ecb55d81-7881-450d-b64a-5978708acd07",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "import streamlit as st\n",
-    "import pandas as pd\n",
-    "import joblib"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 3,
-   "id": "44c094b4-2461-41ea-8c23-e3c8e86bf7f3",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "model = joblib.load(\"fraud_detection_pipeline.pkl\")\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 5,
-   "id": "bf89516b-179d-45d7-a664-13e1aceb0ebb",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "2025-08-03 14:14:55.872 \n",
-      "  \u001b[33m\u001b[1mWarning:\u001b[0m to view this Streamlit app on a browser, run it with the following\n",
-      "  command:\n",
-      "\n",
-      "    streamlit run C:\\Users\\MANOEL\\anaconda3\\Lib\\site-packages\\ipykernel_launcher.py [ARGUMENTS]\n"
-     ]
-    },
-    {
-     "data": {
-      "text/plain": [
-       "DeltaGenerator()"
-      ]
-     },
-     "execution_count": 5,
-     "metadata": {},
-     "output_type": "execute_result"
+import streamlit as st
+import pandas as pd
+import joblib
+
+# --- Custom CSS ---
+st.markdown("""
+    <style>
+    .main {
+        background-color: grey;
     }
-   ],
-   "source": [
-    "st.title(\"Application de détection de fraude\")\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 7,
-   "id": "c1289560-8b17-4c88-b2c7-beca1e0d65cc",
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "DeltaGenerator()"
-      ]
-     },
-     "execution_count": 7,
-     "metadata": {},
-     "output_type": "execute_result"
+    h1 {
+        color: #003366;
+        text-align: center;
     }
-   ],
-   "source": [
-    "st.markdown(\"veillez entrer les détails de la transaction et utiliser le bouton predire\")\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 9,
-   "id": "ee9a4dd2-ee79-482e-a059-d26ccfeaa8c6",
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "DeltaGenerator()"
-      ]
-     },
-     "execution_count": 9,
-     "metadata": {},
-     "output_type": "execute_result"
+    .stButton>button {
+        background-color: #003366;
+        color: white;
+        border-radius: 10px;
+        padding: 0.5em 1.5em;
+        font-size: 16px;
+        margin-top: 20px;
     }
-   ],
-   "source": [
-    "st.divider()\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 11,
-   "id": "cd322b17-ce87-4df2-8a47-3bada5f1220a",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "2025-08-03 14:15:29.289 Session state does not function when running a script without `streamlit run`\n"
-     ]
+    .stMarkdown {
+        text-align: center;
     }
-   ],
-   "source": [
-    "transaction_type = st.selectbox(\"Transaction Type\",[\"PAYMENT\",\"TRANSFER\",\"CASH_OUT\",\"DEPOSIT\"])\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 13,
-   "id": "a4185c3c-4821-4db4-a476-afcffda33e02",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "amount = st.number_input(\"Amount\", min_value=0.0,value=1000.0)\n",
-    "oldbalanceOrg = st.number_input(\"Old Balance (Sender)\", min_value=0.0, value=1000.0)\n",
-    "newbalanceOrg = st.number_input(\"New Balance (Sender)\", min_value=0.0, value=9000.0)\n",
-    "oldbalanceDest = st.number_input(\"Old Balance (Receiver)\", min_value=0.0, value=0.0)\n",
-    "newbalanceDest = st.number_input(\"New Balance (Receiver)\", min_value=0.0, value=0.0)\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 15,
-   "id": "95d6d547-c1e2-4240-a3c1-46883a966317",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "\n",
-    "if st.button(\"predict\"):\n",
-    "    input_data = pd.DataFrame ([{\n",
-    "        \"type\" : transaction_type,\n",
-    "        \"amount\" : amount,\n",
-    "        \"oldbalanceOrg\" : oldbalanceOrg,\n",
-    "        \"newbalanceOrg\" : newbalanceOrg,\n",
-    "        \"oldbalanceDest\" : oldbalanceDest,\n",
-    "        \"newbalanceDest\" : newbalanceDest\n",
-    "    }])\n",
-    "\n",
-    "    prediction = model.predict(input_data)[0]\n",
-    "\n",
-    "    st.subheader(f\"Prediction : '{int(prediction)}'\")\n",
-    "    if prediction == 1:\n",
-    "        st.error(\"This transaction can be fraud\")\n",
-    "    else :\n",
-    "        st.success(\"This transaction looks like it is not a fraud\")"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": none,
-   "id": "3dbf0028-b0aa-41ea-8c80-7a456c823a48",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python [conda env:base] *",
-   "language": "python",
-   "name": "conda-base-py"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.12.7"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+    .box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 15px;
+        border: 2px solid #003366;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        margin: 30px auto;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- Chargement du modèle ---
+try:
+    model = joblib.load("fraud_detection_pipeline.pkl")
+except Exception as e:
+    st.error(f"❌ Erreur de chargement du modèle : {e}")
+    st.stop()
+
+# --- Titre et instructions ---
+st.title(" Application de Détection de Fraude")
+st.markdown(" Veuillez entrer les détails de la transaction, puis cliquer sur le bouton **Prédire**")
+st.divider()
+
+# --- Boîte avec bordure ---
+st.markdown("<div class='box'>", unsafe_allow_html=True)
+
+col1, col2 = st.columns(2)
+with col1:
+    transaction_type = st.selectbox("Type de transaction", ["PAYMENT", "TRANSFER", "CASH_OUT", "DEPOSIT"])
+    amount = st.number_input(" Montant", min_value=0.0, value=1000.0)
+    oldbalanceOrg = st.number_input(" Ancien solde (expéditeur)", min_value=0.0, value=1000.0)
+
+with col2:
+    newbalanceOrig = st.number_input(" Nouveau solde (expéditeur)", min_value=0.0, value=9000.0)
+    oldbalanceDest = st.number_input(" Ancien solde (destinataire)", min_value=0.0, value=0.0)
+    newbalanceDest = st.number_input("Nouveau solde (destinataire)", min_value=0.0, value=0.0)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# --- Bouton Prédire ---
+st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+if st.button(" Prédire"):
+    input_data = pd.DataFrame([{
+        "type": transaction_type,
+        "amount": amount,
+        "oldbalanceOrg": oldbalanceOrg,
+        "newbalanceOrig": newbalanceOrig,
+        "oldbalanceDest": oldbalanceDest,
+        "newbalanceDest": newbalanceDest
+    }])
+
+    prediction = model.predict(input_data)[0]
+    st.subheader(f" Résultat : **{int(prediction)}**")
+    if prediction == 1:
+        st.error("⚠️ Cette transaction est potentiellement frauduleuse.")
+    else:
+        st.success("✅ Cette transaction semble normale.")
+
+st.markdown("</div>", unsafe_allow_html=True)
